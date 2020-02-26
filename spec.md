@@ -9,5 +9,6 @@
     
     
     - A2.3 (WANG Yuhao):
+    The function 3 of the chat bot is that providing various effective measures to prevent new coronavirus.To be specific,when you ask to the bot about how to prevent new coronavirus,it would reply many measures automatically such as correct way to wear a mask,travel advices,etc.
     
     

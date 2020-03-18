@@ -116,6 +116,8 @@ def callback():
 
 # Handler function for Text Message
 ## WANG Yuhao ##
+def handle_TextMessage(event):
+    print(event.message.text)
     if event.message.text=="measures to prevent new coronavirus":
         msg = """You ought to remember the following tips. 
         1.Wearing mask when go outside.

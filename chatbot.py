@@ -15,9 +15,48 @@ from linebot.exceptions import (
 )
 
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageMessage, VideoMessage, FileMessage, StickerMessage, StickerSendMessage
+    MessageEvent, TextMessage, TextSendMessage, ImageMessage, VideoMessage, FileMessage, LocationMessage, StickerMessage, StickerSendMessage, LocationSendMessage
 )
 from linebot.utils import PY3
+from geopy.distance import geodesic
+
+##################### ZHU Feng: START ######################
+class Store:
+    lat   = 0
+    lon   = 0
+    price = 0
+    limit = 0
+    name  = ""
+    def __init__(self, lat, lon, price, limit, name):
+        self.lat   = lat   # the latitude of the store
+        self.lon   = lon   # the longitude of the store
+        self.price = price # price per mask
+        self.limit = limit # purchase limit (max number of masks a consumer could buy each time)
+        self.name  = name  # name of the store
+        
+    def distInKm(self, userLocation): # calculate the distance between the store and the given location from user (in KM)
+            return geodesic( (self.lat, self.lon), userLocation).km
+            
+store1 = Store(22.337998, 114.187433,20,2, "Lok Fu")
+store2 = Store(22.319364, 114.169719,200,100, "Mong Kok")
+store3 = Store(22.341311, 114.194478,100,50, "Wong Tai Sin")
+storeList = []
+storeList.append(store1)
+storeList.append(store2)
+storeList.append(store3)
+def findStoreByDist(storeList, userLocation):
+    theStore = None
+    minDist  = -1.0
+    for s in storeList:
+        if theStore is None:
+            theStore = s
+            minDist  = s.distInKm(userLocation)
+        else:
+            if (s.distInKm(userLocation) < minDist):
+                minDist  = s.distInKm(userLocation)
+                theStore = s
+    return theStore
+##################### ZHU Feng: END ######################
 
 app = Flask(__name__)
 
@@ -112,6 +151,15 @@ def handle_FileMessage(event):
     line_bot_api.reply_message(
 	event.reply_token,
 	TextSendMessage(text="Nice file!")
+    )
+
+# Handler function for Location Message (ZHU Feng)
+def handle_LocationMessage(event):
+    userLocation = (event.message.latitude, event.message.longitude)
+    theStore = findStoreByDist(storeList, userLocation)
+    line_bot_api.reply_message(
+	event.reply_token,
+	LocationSendMessage(title = theStore.name, address = 'Price: $' + str(theStore.price) + '/Piece\nUp to ' + str(theStore.limit) +' piece(s) each customer', latitude = theStore.lat, longitude = theStore.lon)
     )
 
 if __name__ == "__main__":

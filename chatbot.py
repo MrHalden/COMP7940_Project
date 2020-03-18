@@ -162,6 +162,49 @@ def handle_TextMessage(event):
             TextSendMessage(msg)
         )
     ## WANG Yuhao##
+    ## ZHI Yiyao ##
+    shanghai = 'total:358, cure:325, death:3' 
+    hubei = 'total:67799, cure:55989, death:3111'
+    guangdong = 'total:1364, cure:1307, death:8'
+    henan = 'total:1273, cure:1250, death:22'
+    hongkong = 'total:157, cure:88, death:4'
+    total = 'total:81128, cure:68804, death:3231'
+    # total = ImageSendMessage(
+    #     origin_content_url = 'https://res.dotdotnews.com/wp-content/uploads/2020/03/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20200316150731-310x165.png',
+    #     preview_image_url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSan4VwLh7_fQ-nt4bmcHNjRThswwE9UnDvChgMRs_aKus2JZQZ'
+    #     )
+    
+    if event.message.text == "Shanghai" or event.message.text == "shanghai":
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(shanghai)
+        )
+    if event.message.text == "Hubei" or event.message.text == "hubei":
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(hubei)
+        )
+    if event.message.text == "Guangdong" or event.message.text == "guangzhou":
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(guangdong)
+        )
+    if event.message.text == "Henan" or event.message.text == "henan":
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(henan)
+        )
+    if event.message.text == "Hongkong" or event.message.text == "hongkong":
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(hongkong)
+        )
+    if event.message.text == "total" or event.message.text == "Total":
+        line_bot_api.reply_message(
+        event.reply_token,
+        total
+        )
+    ## ZHI Yiyao ##   
 
 # Handler function for Sticker Message
 def handle_StickerMessage(event):

@@ -202,7 +202,7 @@ def handle_TextMessage(event):
     if event.message.text == "total" or event.message.text == "Total":
         line_bot_api.reply_message(
         event.reply_token,
-        total
+        TextSendMessage(total)
         )
     ## ZHI Yiyao ##   
 

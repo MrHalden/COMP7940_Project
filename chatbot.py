@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 import sys
 import redis
+import requests
 
 from argparse import ArgumentParser
 
@@ -19,6 +20,53 @@ from linebot.models import (
 )
 from linebot.utils import PY3
 from geopy.distance import geodesic
+
+######Another Service - Wikipedia######
+def searchWiki(keyword):
+    
+    S = requests.Session()
+
+    URL = "https://en.wikipedia.org/w/api.php"
+    ######## Search API #######
+    PARAMS = {
+        "action": "query",
+        "format": "json",
+        "list": "search",
+        "srsearch": keyword 
+    }
+
+    R = S.get(url=URL, params=PARAMS)
+    searchResult = R.json()
+    isEmptyResult = (searchResult['query']['searchinfo']['totalhits'] == 0)
+    if (isEmptyResult == True): # got empty search result
+        return ("There were no results matching the query. Please try other keywords", "")
+    titles = searchResult['query']['search'][0]['title']
+    pageId = searchResult['query']['search'][0]['pageid']     # get page ID
+    theUrl = "https://en.wikipedia.org/?curid=" + str(pageId) # construct the URL with page ID
+    # using the first result (the most related one)
+    ######## Search API #######
+
+    ######## TextExtracts API #######
+    PARAMS = {
+        "action": "query",
+        "prop": "extracts",
+        "format": "json",
+        "exintro": True,  # only the introduction part
+        "titles": titles, # use the titles we got during the searching
+        "explaintext": True,
+        #exsentences": 1
+        "exchars": 1200
+    }
+    
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+    D = list(DATA['query']['pages'].values())
+    introductionPart = D[0]['extract']
+    firstParagraph =introductionPart.split('\n')[0]
+    ######## TextExtracts API #######
+    
+    return (firstParagraph, theUrl)
+######Another Service - Wikipedia######
 
 ##################### ZHU Feng: START ######################
 class Store:
@@ -155,13 +203,19 @@ def handle_TextMessage(event):
             event.reply_token,
             TextSendMessage(msg)
         )
+    ## WANG Yuhao##
     else:
-        msg = "Sorry,I can't catch your point.You can type in 'measures to prevent new coronavirus' for some information about new coronavirus."
+        ######Wikipedia#####
+        searchResult = searchWiki(event.message.text)
+        introText = ("From Wikipedia: \n" + searchResult[0])
+        print(introText)
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(msg)
+            [TextSendMessage(introText),
+            TextSendMessage("For more information please visit " + searchResult[1])]
         )
-    ## WANG Yuhao##
+        ######Wikipedia#####
+
     ## ZHI Yiyao ##
     shanghai = 'total:358, cure:325, death:3' 
     hubei = 'total:67799, cure:55989, death:3111'

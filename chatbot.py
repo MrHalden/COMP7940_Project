@@ -112,9 +112,9 @@ def findStoreByDist(storeList, userLocation):
 ##################### ZHU Feng: END ######################
 ##################### Using Redis to Store Persistent Information######################
 # My Redis Service:
-HOST = "redis-10501.c73.us-east-1-2.ec2.cloud.redislabs.com"
-PWD = "BgeDERMoPrsCzLUPDCIESaNAfJvHjyqc"
-PORT = "10501" 
+HOST = os.getenv('REDIS_HOST', None)
+PWD  = os.getenv('REDIS_PWD' , None)
+PORT = os.getenv('REDIS_PORT', None)
 r = redis.Redis(host = HOST, password = PWD, port = PORT)
 
 def saveToRedis_Store(lat, lon, price, limit, name):

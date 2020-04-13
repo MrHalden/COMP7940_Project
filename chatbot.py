@@ -142,6 +142,7 @@ saveToRedis_Store(22.319364, 114.169719,200,100, "Sasa (Mong Kok)")
 saveToRedis_Store(22.341311, 114.194478,100,50, "Mannings (Wong Tai Sin)")
 
 storeList = getFromRedis_Store()
+r.set("sample", "This is sample content") # Sample code of saving string to Redis
 ##################### Using Redis to Store Persistent Information######################
 app = Flask(__name__)
 
@@ -220,6 +221,13 @@ def handle_TextMessage(event):
         QuickReply_text_message
     )
     ####ZHU Feng for quick reply location
+    ## Sample Code of getting string from Redis
+    if event.message.text.casefold() == "sample".casefold():
+        msg = r.get("sample").decode("utf-8")
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )
     ## WANG Yuhao ##
     if event.message.text=="measures to prevent new coronavirus":
         msg = """You ought to remember the following tips. 

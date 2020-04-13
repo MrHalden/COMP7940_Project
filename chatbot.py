@@ -16,7 +16,7 @@ from linebot.exceptions import (
 )
 
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageMessage, VideoMessage, FileMessage, LocationMessage, StickerMessage, StickerSendMessage, LocationSendMessage
+    MessageAction,LocationAction, QuickReplyButton, QuickReply, MessageEvent, TextMessage, TextSendMessage, ImageMessage, VideoMessage, FileMessage, LocationMessage, StickerMessage, StickerSendMessage, LocationSendMessage
 )
 from linebot.utils import PY3
 from geopy.distance import geodesic
@@ -84,14 +84,19 @@ class Store:
         
     def distInKm(self, userLocation): # calculate the distance between the store and the given location from user (in KM)
             return geodesic( (self.lat, self.lon), userLocation).km
-            
-store1 = Store(22.337998, 114.187433,20,2, "Lok Fu")
-store2 = Store(22.319364, 114.169719,200,100, "Mong Kok")
-store3 = Store(22.341311, 114.194478,100,50, "Wong Tai Sin")
-storeList = []
-storeList.append(store1)
-storeList.append(store2)
-storeList.append(store3)
+	
+#### Using Redis Instead ####     
+
+#store1 = Store(22.337998, 114.187433,20,2, "Lok Fu") 
+#store2 = Store(22.319364, 114.169719,200,100, "Mong Kok")
+#store3 = Store(22.341311, 114.194478,100,50, "Wong Tai Sin")
+#storeList = []
+#storeList.append(store1)
+#storeList.append(store2)
+#storeList.append(store3)
+
+#### Using Redis Instead ####    
+
 def findStoreByDist(storeList, userLocation):
     theStore = None
     minDist  = -1.0
@@ -105,7 +110,39 @@ def findStoreByDist(storeList, userLocation):
                 theStore = s
     return theStore
 ##################### ZHU Feng: END ######################
+##################### Using Redis to Store Persistent Information######################
+# My Redis Service:
+HOST = "redis-10501.c73.us-east-1-2.ec2.cloud.redislabs.com"
+PWD = "BgeDERMoPrsCzLUPDCIESaNAfJvHjyqc"
+PORT = "10501" 
+r = redis.Redis(host = HOST, password = PWD, port = PORT)
 
+def saveToRedis_Store(lat, lon, price, limit, name):
+    r.rpush("storeList", name)
+    r.hset(name, "lat", lat)
+    r.hset(name, "lon", lon)
+    r.hset(name, "price", price)
+    r.hset(name, "limit", limit)
+    r.hset(name, "name", name)
+
+def getFromRedis_Store():
+    storeList = []
+    storeList_redis = r.lrange("storeList", 0, -1)
+    for store_redis in storeList_redis:
+        tmpStore_redis = r.hgetall(store_redis.decode("utf-8"))
+        #print(tmpStore_redis)
+        tmpStore = Store(lat=tmpStore_redis[b'lat'].decode("utf-8"),lon=tmpStore_redis[b'lon'].decode("utf-8"), price=tmpStore_redis[b'price'].decode("utf-8"), limit=tmpStore_redis[b'limit'].decode("utf-8"), name=tmpStore_redis[b'name'].decode("utf-8"))
+        storeList.append(tmpStore)
+    #for store in storeList:
+        #print(store.lat.decode("utf-8"))
+    return storeList
+
+saveToRedis_Store(22.337998, 114.187433,20,2, "Watsons (Lok Fu)")
+saveToRedis_Store(22.319364, 114.169719,200,100, "Sasa (Mong Kok)")
+saveToRedis_Store(22.341311, 114.194478,100,50, "Mannings (Wong Tai Sin)")
+
+storeList = getFromRedis_Store()
+##################### Using Redis to Store Persistent Information######################
 app = Flask(__name__)
 
 # get channel_secret and channel_access_token from your environment variable
@@ -163,9 +200,27 @@ def callback():
     return 'OK'
 
 # Handler function for Text Message
-## WANG Yuhao ##
+
 def handle_TextMessage(event):
     print(event.message.text)
+    ####ZHU Feng for quick reply location
+    QuickReply_text_message = TextSendMessage(
+        text = 'Please send your location so that we could help you find a neaby face mask store',
+        quick_reply = QuickReply(
+            items = [
+                QuickReplyButton(
+                    action = LocationAction(label = "Send Location"),
+                )
+            ]
+        )
+    )
+    if event.message.text.casefold() == "Find Mask".casefold():
+        line_bot_api.reply_message(
+        event.reply_token,
+        QuickReply_text_message
+    )
+    ####ZHU Feng for quick reply location
+    ## WANG Yuhao ##
     if event.message.text=="measures to prevent new coronavirus":
         msg = """You ought to remember the following tips. 
         1.Wearing mask when go outside.

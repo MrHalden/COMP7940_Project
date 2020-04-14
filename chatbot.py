@@ -143,6 +143,13 @@ saveToRedis_Store(22.341311, 114.194478,100,50, "Mannings (Wong Tai Sin)")
 
 storeList = getFromRedis_Store()
 r.set("sample", "This is sample content") # Sample code of saving string to Redis
+r.hset(name = "infection", key = "shanghai", value = 153)
+r.hset(name = "infection", key = "hubei", value = 244)
+r.hset(name = "infection", key = "hongkong", value = 608)
+r.hset(name = "infection", key = "beijing", value = 97)
+r.hset(name = "infection", key = "guangdong", value = 92)
+r.hset(name = "infection", key = "taiwan", value = 273)
+
 ##################### Using Redis to Store Persistent Information######################
 app = Flask(__name__)
 
@@ -267,6 +274,59 @@ def handle_TextMessage(event):
             TextSendMessage(msg)
         )
     ## WANG Yuhao##
+    
+    ## ZHI Yiyao ##
+       
+    if event.message.text.casefold() == "shanghai".casefold():
+        msg = "current number: " + r.hget("infection", "shanghai").decode("utf-8")
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )
+
+    if event.message.text.casefold() == "hubei".casefold():
+        msg = "current number: " + r.hget("infection", "hubei").decode("utf-8")
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )
+
+    if event.message.text.casefold() == "hongkong".casefold():
+        msg = "current number: " + r.hget("infection", "hongkong").decode("utf-8")
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )
+
+    if event.message.text.casefold() == "guangdong".casefold():
+        msg = "current number: " + r.hget("infection", "guangdong").decode("utf-8")
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )
+
+    if event.message.text.casefold() == "taiwan".casefold():
+        msg = "current number: " + r.hget("infection", "taiwan").decode("utf-8")
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )    
+    
+    if event.message.text.casefold() == "beijing".casefold():
+        msg = "current number: " + r.hget("infection", "beijing").decode("utf-8")
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )    
+
+    if event.message.text.casefold() == "total".casefold():
+        msg = "To view real-time situation please visit  " + "https://voice.baidu.com/act/newpneumonia/newpneumonia/?from=osari_pc_3"
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )          
+    ## ZHI Yiyao ##   
+
     else:
         ######Wikipedia#####
         searchResult = searchWiki(event.message.text)
@@ -279,49 +339,6 @@ def handle_TextMessage(event):
         )
         ######Wikipedia#####
 
-    ## ZHI Yiyao ##
-    shanghai = 'total:358, cure:325, death:3' 
-    hubei = 'total:67799, cure:55989, death:3111'
-    guangdong = 'total:1364, cure:1307, death:8'
-    henan = 'total:1273, cure:1250, death:22'
-    hongkong = 'total:157, cure:88, death:4'
-    total = 'total:81128, cure:68804, death:3231'
-    # total = ImageSendMessage(
-    #     origin_content_url = 'https://res.dotdotnews.com/wp-content/uploads/2020/03/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20200316150731-310x165.png',
-    #     preview_image_url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSan4VwLh7_fQ-nt4bmcHNjRThswwE9UnDvChgMRs_aKus2JZQZ'
-    #     )
-    
-    if event.message.text == "Shanghai" or event.message.text == "shanghai":
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(shanghai)
-        )
-    if event.message.text == "Hubei" or event.message.text == "hubei":
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(hubei)
-        )
-    if event.message.text == "Guangdong" or event.message.text == "guangzhou":
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(guangdong)
-        )
-    if event.message.text == "Henan" or event.message.text == "henan":
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(henan)
-        )
-    if event.message.text == "Hongkong" or event.message.text == "hongkong":
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(hongkong)
-        )
-    if event.message.text == "total" or event.message.text == "Total":
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(total)
-        )
-    ## ZHI Yiyao ##   
 
 # Handler function for Sticker Message
 def handle_StickerMessage(event):

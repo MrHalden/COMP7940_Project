@@ -109,6 +109,18 @@ def findStoreByDist(storeList, userLocation):
                 minDist  = s.distInKm(userLocation)
                 theStore = s
     return theStore
+def findStoreByPrice(storeList):
+    theStore = None
+    minPrice = -1.0
+    for s in storeList:
+        if theStore is None:
+            theStore = s
+            minPrice = s.price
+        else:
+            if (int(s.price) < int(minPrice)):
+                minPrice = s.price
+                theStore = s
+    return theStore
 ##################### ZHU Feng: END ######################
 ##################### Using Redis to Store Persistent Information######################
 # My Redis Service:
@@ -116,6 +128,7 @@ HOST = os.getenv('REDIS_HOST', None)
 PWD  = os.getenv('REDIS_PWD' , None)
 PORT = os.getenv('REDIS_PORT', None)
 r = redis.Redis(host = HOST, password = PWD, port = PORT)
+r.flushall() # flush every time the service start
 
 def saveToRedis_Store(lat, lon, price, limit, name):
     r.rpush("storeList", name)
@@ -211,6 +224,41 @@ def callback():
 
 def handle_TextMessage(event):
     print(event.message.text)
+    #### Stateful ####
+    if event.message.text.casefold() == "config/findMask/cheapest".casefold():
+        r.set(event.source.user_id, "cheap") # rememeber every user's preference
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage("OK, We will find the cheapest mask store for you")
+        )
+    elif event.message.text.casefold() == "config/findMask/nearest".casefold():
+        r.set(event.source.user_id, "nearby") # rememeber every user's preference
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage("OK, We will find the nearest mask store for you")
+        )        
+    #### Stateful ####
+    QuickReply_text_message_config = TextSendMessage( # quick reply for config
+        text = 'Here are the available configurations for finding masks',
+        quick_reply = QuickReply(
+            items = [
+                QuickReplyButton(
+                    action = MessageAction(label = "Cheap Mask First", text = "config/findMask/cheapest"),
+                    image_url = "https://cdn1.iconfinder.com/data/icons/ios-11-glyphs/30/money_bag-512.png"
+                ),
+                QuickReplyButton(
+                    action = MessageAction(label = "Nearby Mask First", text = "config/findMask/nearest"),
+                    image_url = "https://lh3.googleusercontent.com/proxy/1a9k68551lJJFBDpXMENUSDxJC33VlTmir0Bj2LrZJ5QLOoHD6V8G-k3wpAfjdqN7oizSWerzL1nWwWbHKaYz3FCkOe5GpaV1OhRVJQQLrKHINKqMA"
+                )
+            ]
+        )
+    )
+
+    if event.message.text.casefold() == "config".casefold() :# quick reply for config
+        line_bot_api.reply_message(
+        event.reply_token,
+        QuickReply_text_message_config
+        )
     ####ZHU Feng for quick reply location
     QuickReply_text_message = TextSendMessage(
         text = 'Please send your location so that we could help you find a neaby face mask store',
@@ -373,7 +421,14 @@ def handle_FileMessage(event):
 # Handler function for Location Message (ZHU Feng)
 def handle_LocationMessage(event):
     userLocation = (event.message.latitude, event.message.longitude)
-    theStore = findStoreByDist(storeList, userLocation)
+    config = r.get(event.source.user_id)
+    print(config)
+    if (config == b'cheap'):
+        theStore = findStoreByPrice(storeList)
+        print("find cheapest")
+    else: # no config or nearby
+        theStore = findStoreByDist(storeList, userLocation)
+        print("find nearest")
     line_bot_api.reply_message(
 	event.reply_token,
 	LocationSendMessage(title = theStore.name, address = 'Price: $' + str(theStore.price) + '/Piece\nUp to ' + str(theStore.limit) +' piece(s) each customer', latitude = theStore.lat, longitude = theStore.lon)

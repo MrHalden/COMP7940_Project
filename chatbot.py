@@ -212,7 +212,8 @@ def callback():
             handle_FileMessage(event)
         if isinstance(event.message, StickerMessage):
             handle_StickerMessage(event)
-
+        if isinstance(event.message, LocationMessage):
+            handle_LocationMessage(event) # ZHU Feng's part	
         if not isinstance(event, MessageEvent):
             continue
         if not isinstance(event.message, TextMessage):

@@ -16,7 +16,7 @@ from linebot.exceptions import (
 )
 
 from linebot.models import (
-    MessageAction,LocationAction, QuickReplyButton, QuickReply, MessageEvent, TextMessage, TextSendMessage, ImageMessage, VideoMessage, FileMessage, LocationMessage, StickerMessage, StickerSendMessage, LocationSendMessage
+    PostbackTemplateAction,MessageTemplateAction,URITemplateAction,CarouselTemplate,TemplateSendMessage,CarouselColumn, MessageAction,LocationAction, QuickReplyButton, QuickReply, MessageEvent, TextMessage, TextSendMessage, ImageMessage, VideoMessage, FileMessage, LocationMessage, StickerMessage, StickerSendMessage, LocationSendMessage
 )
 from linebot.utils import PY3
 from geopy.distance import geodesic
@@ -162,7 +162,18 @@ r.hset(name = "infection", key = "hongkong", value = 608)
 r.hset(name = "infection", key = "beijing", value = 97)
 r.hset(name = "infection", key = "guangdong", value = 92)
 r.hset(name = "infection", key = "taiwan", value = 273)
-
+r.set('tip1',"""How to wear mask correctly.
+·The coloured side of the mask faces outwards, with the metallic strip uppermost.
+·The strings or elastic bands are positioned properly to keep the mask firmly in place.
+·The mask covers the nose, mouth and chin.
+·The metallic strip moulds to the bridge of the nose.""")
+r.set('tip2', """How to wash hands correctly.
+·Wet your hands with clean, running water (warm or cold), turn off the tap, and apply soap....
+·Lather your hands by rubbing them together with the soap. 
+·Lather the backs of your hands, between your fingers, and under your nails.
+·Scrub your hands for at least 20 seconds. Need a timer? Hum the “Happy Birthday” song from beginning to end twice.
+·Rinse your hands well under clean, running water.Dry your hands using a clean towel or air dry them.""")
+r.set('tip3',"May be staying at home is the best choice,although the situation in China is getting better and better.If you'd like to travel abroad(like US,France,etc),that's not a good idea.")
 ##################### Using Redis to Store Persistent Information######################
 app = Flask(__name__)
 
@@ -213,7 +224,7 @@ def callback():
         if isinstance(event.message, StickerMessage):
             handle_StickerMessage(event)
         if isinstance(event.message, LocationMessage):
-            handle_LocationMessage(event) # ZHU Feng's part	
+            handle_LocationMessage(event) # ZHU Feng's part
         if not isinstance(event, MessageEvent):
             continue
         if not isinstance(event.message, TextMessage):
@@ -285,43 +296,130 @@ def handle_TextMessage(event):
         TextSendMessage(msg)
         )
     ## WANG Yuhao ##
-    if event.message.text=="measures to prevent new coronavirus":
-        msg = """You ought to remember the following tips. 
-        1.Wearing mask when go outside.
-        2.Washing hands frequently.
-        3.Do not go to the crowed places.
-        If you want to know more details,just type in the serial number."""
+
+    print(event.message.text)
+    if event.message.text=="coronavirus tips":
+        message = TemplateSendMessage(
+            alt_text='Carousel template',
+            template=CarouselTemplate(
+                columns=[
+                    CarouselColumn(
+                        thumbnail_image_url='https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR5mlTGpxz5Ogie5g93siEvUcTy5dMxnOAJeiUwrTFSJtOEIi8u&usqp=CAU',
+                        title='Measure 1',
+                        text='Wear mask when go outside.',
+                        actions=[
+                            PostbackTemplateAction(
+                                label='Some tips',
+                                text='tip 1',
+                                data='action=buy&itemid=1'
+                            ),
+#                             MessageTemplateAction(
+#                                 label='message1',
+#                                 text='message text1'
+#                             ),
+                            URITemplateAction(
+                                label='More details',
+                                uri='https://jingyan.baidu.com/article/f54ae2fc46c8061e93b84950.html'
+                            )
+                        ]
+                    ),
+                    CarouselColumn(
+                        thumbnail_image_url='https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTruPXKu--ondWTUstQVMeqAc__4WMTB97rI6lSS-0gK2c7QPmE&usqp=CAU',
+                        title='Measure 2',
+                        text='Wash hands frequently.',
+                        actions=[
+                            PostbackTemplateAction(
+                                label='Some tips',
+                                text='tip 2',
+                                data='action=buy&itemid=1'
+                            ),
+#                             MessageTemplateAction(
+#                                 label='message1',
+#                                 text='message text1'
+#                             ),
+                            URITemplateAction(
+                                label='More details',
+                                uri='https://jingyan.baidu.com/article/ff4116257cae5753e48237de.html'
+                            )
+                        ]
+                    ),
+                    CarouselColumn(
+                        thumbnail_image_url='https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTIZzVtv-nGuPw-FebkzaIGI28s9PdBG3gTWtdDH5iHcK0mvvr5&usqp=CAU',
+                        title='Measure 3',
+                        text='Do not go to the crowed places.',
+                        actions=[
+                            PostbackTemplateAction(
+                                label='Some tips',
+                                text='tip 3',
+                                data='action=buy&itemid=2'
+                            ),
+#                             MessageTemplateAction(
+#                                 label='message2',
+#                                 text='message text2'
+#                             ),
+                            URITemplateAction(
+                                label='More details',
+                                uri='https://voice.baidu.com/act/newpneumonia/newpneumonia/?from=osari_pc_3'
+                            )
+                        ]
+                    )
+                ]
+            )
+        )
+        line_bot_api.reply_message(
+            event.reply_token,
+            message
+        )
+#more buttons and images instead of only words,looks better
+
+#         msg = """You ought to remember the following tips. 
+#         1.Wearing mask when go outside.
+#         2.Washing hands frequently.
+#         3.Do not go to the crowed places.
+#         If you want to know more details,just type in the serial number."""
+#         line_bot_api.reply_message(
+#             event.reply_token,
+#             TextSendMessage(msg)
+#         )
+    elif event.message.text=="tip 1":
+        msg=r.get('tip1').decode("utf-8")
+###############using redis##################
+#         msg = """How to wear mask correctly.
+#         ·The coloured side of the mask faces outwards, with the metallic strip uppermost.
+#         ·The strings or elastic bands are positioned properly to keep the mask firmly in place.
+#         ·The mask covers the nose, mouth and chin.
+#         ·The metallic strip moulds to the bridge of the nose."""
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(msg)
         )
-    elif event.message.text=="1":
-        msg = """How to wear mask correctly.
-        ·The coloured side of the mask faces outwards, with the metallic strip uppermost.
-        ·The strings or elastic bands are positioned properly to keep the mask firmly in place.
-        ·The mask covers the nose, mouth and chin.
-        ·The metallic strip moulds to the bridge of the nose."""
+    elif event.message.text=="tip 2":
+        msg=r.get('tip2').decode("utf-8")
+###############using redis##################
+#         msg = """How to wash hands correctly.
+#         ·Wet your hands with clean, running water (warm or cold), turn off the tap, and apply soap....
+#         ·Lather your hands by rubbing them together with the soap. 
+#         ·Lather the backs of your hands, between your fingers, and under your nails.
+#         ·Scrub your hands for at least 20 seconds. Need a timer? Hum the “Happy Birthday” song from beginning to end twice.
+#         ·Rinse your hands well under clean, running water.Dry your hands using a clean towel or air dry them."""
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(msg)
         )
-    elif event.message.text=="2":
-        msg = """How to wash hands correctly.
-        ·Wet your hands with clean, running water (warm or cold), turn off the tap, and apply soap.
-        ·Lather your hands by rubbing them together with the soap. 
-        ·Lather the backs of your hands, between your fingers, and under your nails.
-        ·Scrub your hands for at least 20 seconds. Need a timer? Hum the “Happy Birthday” song from beginning to end twice.
-        ·Rinse your hands well under clean, running water.Dry your hands using a clean towel or air dry them."""
+    elif event.message.text=="tip 3":
+        msg=r.get('tip3').decode("utf-8")
+#############using redis##################
+#         msg = "May be staying at home is the best choice,although the situation in China is getting better and better.If you'd like to travel abroad(like US,France,etc),that's not a good idea."
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(msg)
         )
-    elif event.message.text=="3":
-        msg = "May be staying at home is the best choice,although the situation in China is getting better and better.If you'd like to travel abroad(like US,France,etc),that's not a good idea."
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(msg)
-        )
+#     else:
+#         msg = "Sorry,I can't catch your point.You can type in 'measures to prevent new coronavirus' for some information about new coronavirus."
+#         line_bot_api.reply_message(
+#             event.reply_token,
+#             TextSendMessage(msg)
+#         )
     ## WANG Yuhao##
     
     ## ZHI Yiyao ##

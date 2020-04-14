@@ -277,49 +277,49 @@ def handle_TextMessage(event):
     
     ## ZHI Yiyao ##
        
-    if event.message.text.casefold() == "shanghai".casefold():
+    elif event.message.text.casefold() == "shanghai".casefold():
         msg = "current number: " + r.hget("infection", "shanghai").decode("utf-8")
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(msg)
         )
 
-    if event.message.text.casefold() == "hubei".casefold():
+    elif event.message.text.casefold() == "hubei".casefold():
         msg = "current number: " + r.hget("infection", "hubei").decode("utf-8")
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(msg)
         )
 
-    if event.message.text.casefold() == "hongkong".casefold():
+    elif event.message.text.casefold() == "hongkong".casefold():
         msg = "current number: " + r.hget("infection", "hongkong").decode("utf-8")
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(msg)
         )
 
-    if event.message.text.casefold() == "guangdong".casefold():
+    elif event.message.text.casefold() == "guangdong".casefold():
         msg = "current number: " + r.hget("infection", "guangdong").decode("utf-8")
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(msg)
         )
 
-    if event.message.text.casefold() == "taiwan".casefold():
+    elif event.message.text.casefold() == "taiwan".casefold():
         msg = "current number: " + r.hget("infection", "taiwan").decode("utf-8")
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(msg)
         )    
     
-    if event.message.text.casefold() == "beijing".casefold():
+    elif event.message.text.casefold() == "beijing".casefold():
         msg = "current number: " + r.hget("infection", "beijing").decode("utf-8")
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(msg)
         )    
 
-    if event.message.text.casefold() == "total".casefold():
+    elif event.message.text.casefold() == "total".casefold():
         msg = "To view real-time situation please visit  " + "https://voice.baidu.com/act/newpneumonia/newpneumonia/?from=osari_pc_3"
         line_bot_api.reply_message(
         event.reply_token,

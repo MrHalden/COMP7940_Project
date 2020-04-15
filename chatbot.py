@@ -291,14 +291,28 @@ def handle_TextMessage(event):
         r.set(event.source.user_id, "cheap") # rememeber every user's preference
         line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage("OK, We will find the cheapest mask store for you")
-        )
+        TextSendMessage( # quick reply for config
+        text = 'OK, We will find the cheapest mask store for you',
+        quick_reply = QuickReply(
+            items = [
+                QuickReplyButton(
+                    action = MessageAction(label = "Find Mask NOW!", text = "Find Mask")
+                )
+            ]
+        )))
     elif event.message.text.casefold() == "config/findMask/nearest".casefold():
         r.set(event.source.user_id, "nearby") # rememeber every user's preference
         line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage("OK, We will find the nearest mask store for you")
-        )        
+        TextSendMessage( # quick reply for config
+        text = 'OK, We will find the nearest mask store for you',
+        quick_reply = QuickReply(
+            items = [
+                QuickReplyButton(
+                    action = MessageAction(label = "Find Mask NOW!", text = "Find Mask")
+                )
+            ]
+        )))        
     #### Stateful ####
     QuickReply_text_message_config = TextSendMessage( # quick reply for config
         text = 'Here are the available configurations for finding masks',

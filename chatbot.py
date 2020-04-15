@@ -39,7 +39,7 @@ def searchWiki(keyword):
     searchResult = R.json()
     isEmptyResult = (searchResult['query']['searchinfo']['totalhits'] == 0)
     if (isEmptyResult == True): # got empty search result
-        return ("There were no results matching the query. Please try other keywords", "")
+        return ("There were no results matching the query. Please try other keywords", 'If you want to exit Search Mode, please send "exit"')
     titles = searchResult['query']['search'][0]['title']
     pageId = searchResult['query']['search'][0]['pageid']     # get page ID
     theUrl = "https://en.wikipedia.org/?curid=" + str(pageId) # construct the URL with page ID
@@ -65,8 +65,7 @@ def searchWiki(keyword):
     firstParagraph =introductionPart.split('\n')[0]
     ######## TextExtracts API #######
     
-    return (firstParagraph, theUrl)
-######Another Service - Wikipedia######
+    return (firstParagraph, "For more information please visit " + theUrl)
 
 ##################### ZHU Feng: START ######################
 class Store:
@@ -255,7 +254,7 @@ def handle_TextMessage(event):
         line_bot_api.reply_message(
             event.reply_token,
             [TextSendMessage(introText),
-            TextSendMessage("For more information please visit " + searchResult[1])]
+            TextSendMessage(searchResult[1])]
         )
         ######Wikipedia#####
     #### IN Search Mode ####

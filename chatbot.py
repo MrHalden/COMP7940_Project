@@ -236,6 +236,13 @@ def callback():
 
 def handle_TextMessage(event):
     print(event.message.text)
+    #### Help ####
+    if event.message.text.casefold() == "help".casefold():
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage('You could send "coronavirus tips" to get some tips.\n\nYou could send some city name (e.g. HongKong, Beijing, Shanghai) to get the corresponding comfirmed coronavirus cases. You could also send "total" to get the total case number.\n\nYou could send "Find Mask" to find some face masks. You could also send "config" to choose find the nearest or the cheapest face mask.')
+        )    
+    #### Help ####
     #### Stateful ####
     if event.message.text.casefold() == "config/findMask/cheapest".casefold():
         r.set(event.source.user_id, "cheap") # rememeber every user's preference

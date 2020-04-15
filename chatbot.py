@@ -236,6 +236,49 @@ def callback():
 
 def handle_TextMessage(event):
     print(event.message.text)
+#### Get If in Search Mode ####
+    currentStatus = r.get(event.source.user_id+"search")
+    #### IN Search Mode ####
+    if currentStatus ==  b'1':
+        if event.message.text.casefold() == "exit".casefold(): #### exit search mode
+            r.set(event.source.user_id+"search", 0)
+            msg = 'Successfully exit Search Mode. You could send "help" to learn how to use in the normal mode.' 
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(msg)
+            )
+            return
+        ######Wikipedia#####
+        searchResult = searchWiki(event.message.text)
+        introText = ("From Wikipedia: \n" + searchResult[0])
+        print(introText)
+        line_bot_api.reply_message(
+            event.reply_token,
+            [TextSendMessage(introText),
+            TextSendMessage("For more information please visit " + searchResult[1])]
+        )
+        ######Wikipedia#####
+    #### IN Search Mode ####
+    #### Enter Search Mode ####
+    if event.message.text.casefold() == "search mode".casefold():
+        r.set(event.source.user_id+"search", 1)
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage('You are in Search Mode now. You could send any keywords to search. To exit Search Mode, please send "exit".')
+        )   
+    #### Enter Search Mode ####
+    #### Exit Search Mode ####
+    if event.message.text.casefold() == "exit".casefold():
+        if currentStatus ==  b'1':
+            r.set(event.source.user_id+"search", 0)
+            msg = 'Successfully exit Search Mode. You could send "help" to learn how to use in the normal mode.'
+        else:
+            msg = 'You have already exited the Search Mode. You are in normal mode now. You could send "help" to learn how to use in the normal mode.'
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(msg)
+        )   
+    #### Exit Search Mode ####
     #### Help ####
     if event.message.text.casefold() == "help".casefold():
         line_bot_api.reply_message(
@@ -482,16 +525,20 @@ def handle_TextMessage(event):
     ## ZHI Yiyao ##   
 
     else:
-        ######Wikipedia#####
-        searchResult = searchWiki(event.message.text)
-        introText = ("From Wikipedia: \n" + searchResult[0])
-        print(introText)
+        QuickReply_text_message_help = TextSendMessage( # quick reply for help
+            text = 'Sorry, I cannot understand you. Send "help" to learn how to use this bot',
+            quick_reply = QuickReply(
+                items = [
+                    QuickReplyButton(
+                        action = MessageAction(label = "I need help NOW!", text = "help")
+                    )
+                ]
+            )
+        )
         line_bot_api.reply_message(
             event.reply_token,
-            [TextSendMessage(introText),
-            TextSendMessage("For more information please visit " + searchResult[1])]
+            QuickReply_text_message_help
         )
-        ######Wikipedia#####
 
 
 # Handler function for Sticker Message

@@ -588,18 +588,22 @@ def handle_FileMessage(event):
 # Handler function for Location Message (ZHU Feng)
 def handle_LocationMessage(event):
     userLocation = (event.message.latitude, event.message.longitude)
+    print(event.source.user_id)
     config = r.get(event.source.user_id)
     print(config)
     if (config == b'cheap'):
         theStore = findStoreByPrice(storeList)
+        text_loc = "Here is the cheapest mask store:"
         print("find cheapest")
     else: # no config or nearby
         theStore = findStoreByDist(storeList, userLocation)
+        text_loc = "Here is the closes mask store:"
         print("find nearest")
     line_bot_api.reply_message(
 	event.reply_token,
+    [TextSendMessage(text_loc),
 	LocationSendMessage(title = theStore.name, address = 'Price: $' + str(theStore.price) + '/Piece\nUp to ' + str(theStore.limit) +' piece(s) each customer', latitude = theStore.lat, longitude = theStore.lon)
-    )
+    ])
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(

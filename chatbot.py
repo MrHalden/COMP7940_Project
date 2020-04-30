@@ -149,8 +149,8 @@ def getFromRedis_Store():
         #print(store.lat.decode("utf-8"))
     return storeList
 
-saveToRedis_Store(22.337998, 114.187433,20,2, "Watsons (Lok Fu)")
-saveToRedis_Store(22.319364, 114.169719,200,100, "Sasa (Mong Kok)")
+saveToRedis_Store(22.337998, 114.187433,200,2, "Watsons (Lok Fu)")
+saveToRedis_Store(22.319364, 114.169719,50,100, "Sasa (Mong Kok)")
 saveToRedis_Store(22.341311, 114.194478,100,50, "Mannings (Wong Tai Sin)")
 
 storeList = getFromRedis_Store()

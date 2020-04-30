@@ -283,7 +283,7 @@ def handle_TextMessage(event):
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage( # quick reply for help
-        text = 'You could send "coronavirus tips" to get some tips.\n\nYou could send some city name (e.g. HongKong, Beijing, Shanghai) to get the corresponding comfirmed coronavirus cases. You could also send "total" to get the total case number.\n\nYou could send "Find Mask" to find some face masks. You could also send "config" to choose find the nearest or the cheapest face mask.\n\n You could send "search mode" to get in Wikipedia Search Mode',
+        text = 'You could send "coronavirus tips" to get some tips.\n\nYou could send some city names (e.g. HongKong, Beijing, Shanghai) to get the corresponding comfirmed coronavirus cases. You could also send "total" to get the total case number.\n\nYou could send "Find Mask" to find some face masks. You could also send "config" to choose find the nearest or the cheapest face mask.\n\n You could send "search mode" to get in Wikipedia Search Mode',
         quick_reply = QuickReply(
             items = [
                 QuickReplyButton(
@@ -618,7 +618,7 @@ def handle_LocationMessage(event):
         print("find cheapest")
     else: # no config or nearby
         theStore = findStoreByDist(storeList, userLocation)
-        text_loc = "Here is the closes mask store:"
+        text_loc = "Here is the closest mask store:"
         print("find nearest")
     line_bot_api.reply_message(
 	event.reply_token,
